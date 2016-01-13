@@ -1,7 +1,0 @@
-// for dev, run ElasticSearch on my mac
-docker run -d -p 9200:9200 -p 9300:9300 elasticsearch -Des.network.bindHost=0.0.0.0
-docker run -d -p 3000:3000 -it --name scrumbot -v "$PWD":/usr/src/app -w /usr/src/app node:4 node bin/www
-
-// for prod, run ElasticSearch, but only expose its ports on localhost
-docker run -d -p 127.0.0.1:9200:9200 -p 127.0.0.1:9300:9300 elasticsearch
-docker run -d -p 80:3000 -it --name scrumbot -v "$PWD":/usr/src/app -w /usr/src/app node:4 node bin/www

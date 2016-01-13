@@ -1,0 +1,8 @@
+.idea
+*.iml
+*.log
+
+logs
+Dockerfile
+config.json
+README.md
