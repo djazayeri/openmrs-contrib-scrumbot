@@ -1,6 +1,3 @@
-//var _ = require("lodash");
-//var moment = require("moment");
-
 var log = require("./log");
 var config = require("./config");
 var ircbot = require("./ircbot");

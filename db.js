@@ -1,4 +1,6 @@
 var elasticsearch = require('elasticsearch');
+var ejs = require('elastic.js');
+var _ = require("lodash");
 
 var log = require("./log");
 var config = require("./config");
@@ -59,14 +61,6 @@ module.exports.setupDb = function () {
 };
 
 module.exports.recordScrum = function (processedScrum) {
-    //client.ping({}, function(error) {
-    //    if (error) {
-    //        log.error("Failed to connect to ElasticSearch at " + host);
-    //        log.error(error);
-    //        // should send a message to the IRC channel here
-    //    }
-    //});
-
     client.index({
         index: "scrum",
         type: "conversation",
@@ -80,3 +74,13 @@ module.exports.recordScrum = function (processedScrum) {
         }
     });
 };
+
+module.exports.thisWeekScrums = function () {
+    return client.search({
+        index: "scrum",
+        body: ejs.Request()
+            .query(ejs.RangeQuery("startTime", {gte: "now/w"}))
+    }).then(function (response) {
+        return _.pluck(response.hits.hits, "_source");
+    });
+}

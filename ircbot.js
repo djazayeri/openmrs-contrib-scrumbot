@@ -3,6 +3,7 @@ var _ = require("lodash");
 var moment = require("moment");
 
 var log = require("./log");
+var processor = require("./processor");
 
 var CHANNEL = "#openmrstest";
 var NICK = "omrs-scrum-bot";
