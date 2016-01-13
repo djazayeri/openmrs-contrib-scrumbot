@@ -1,0 +1,6 @@
+extends layout
+
+block content
+    div(ng-app="scrum", ng-controller="IndexController")
+        ng-include(src="'partials/index.html'")
+    script(src="/javascripts/index.js")
