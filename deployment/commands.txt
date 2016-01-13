@@ -1,0 +1,5 @@
+// for prod, run ElasticSearch, but only expose its ports on localhost
+docker run -d -p 127.0.0.1:9200:9200 -p 127.0.0.1:9300:9300 elasticsearch
+
+// for dev, run ElasticSearch on my mac
+docker run -d -p 9200:9200 -p 9300:9300 elasticsearch -Des.network.bindHost=0.0.0.0

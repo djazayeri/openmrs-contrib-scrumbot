@@ -1,0 +1,17 @@
+{
+  "appenders": [
+    {
+      "type": "console"
+    },
+    {
+      "type": "logLevelFilter",
+      "level": "INFO",
+      "appender": {
+        "type": "file",
+        "filename": "logs/scrumbot.log",
+        "maxLogSize": 10240,
+        "backups": 3
+      }
+    }
+  ]
+}
