@@ -1,0 +1,30 @@
+{
+  "name": "openmrs-contrib-scrumbot",
+  "version": "1.0.0",
+  "description": "Listens to the #openmrs IRC channel to archives and organize scrum comments",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "OpenMRS",
+    "Scrum",
+    "IRC"
+  ],
+  "author": "djazayeri",
+  "license": "MPL v2",
+  "dependencies": {
+    "elasticsearch": "^10.1.2",
+    "fs": "0.0.2",
+    "irc": "^0.4.0",
+    "lodash": "^3.10.1",
+    "log4js": "^0.6.29",
+    "moment": "^2.11.1",
+    "nconf": "^0.8.2"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "mocha": "^2.3.4",
+    "sinon": "^1.17.2"
+  }
+}
