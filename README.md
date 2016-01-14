@@ -19,6 +19,9 @@
 If you do not have elasticsearch running on localhost:9200, then create a "config.json" file like this:
 
     {
+      "irc": {
+        "channel": "#openmrstest"
+      },
       "elasticsearch": {
         "host": "http://192.168.99.100:9200"
       }

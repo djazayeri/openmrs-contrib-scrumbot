@@ -1,0 +1,37 @@
+<h3>Issue details</h3>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            <a target="_new" href="https://issues.openmrs.org/browse/{{issueKey}}" class="label label-info pull-right">
+                View in JIRA
+                <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+            </a>
+            {{ issueKey }}
+            - {{ issue.summary }}
+
+            <span class="label label-default">
+                {{ issue.status.name }}
+                <span ng-show="issue.resolution">
+                    - {{ issue.resolution.name }}
+                </span>
+            </span>
+
+            <span ng-show="issue.assignee" class="label label-success">
+                <img ng-show="issue.assignee.avatarUrls['16x16']" src="{{ issue.assignee.avatarUrls['16x16'] }}"/>
+                {{ issue.assignee.displayName }}
+            </span>
+        </h3>
+    </div>
+    <div class="panel-body">
+        <pre class="pre-scrollable">{{ issue.description }}</pre>
+    </div>
+</div>
+
+<h3>Mentioned in scrums</h3>
+
+<div ng-repeat="scrum in scrums">
+    <a ui-sref="scrum({startTime: scrum.startTime})">
+        {{ scrum.startTime | prettyDate }} ({{ scrum.startTime | date }})
+    </a>
+</div>

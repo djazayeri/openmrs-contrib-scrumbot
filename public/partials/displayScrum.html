@@ -1,0 +1,43 @@
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            {{ scrum.startTime | date }}
+            {{ scrum.startTime | time }}
+            ({{ scrum.startTime | prettyDate }}, lasted {{scrum | scrumDuration}})
+        </h3>
+    </div>
+    <div class="panel-body">
+        <div class="col-md-4">
+            <table class="table">
+                <tbody>
+                <tr>
+                    <th>Participants</th>
+                    <td>
+                        <span ng-repeat="p in scrum.participants">
+                            {{ p }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Issues mentioned</th>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li ng-repeat="i in scrum.issues">
+                                <a ui-sref="issue({ issueKey: i})">{{ i }}</a>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-8">
+            <ul>
+                <li ng-repeat="line in scrum.raw">
+                    <small>{{line.timestamp | time}}</small>
+                    | {{line.from}} | {{line.message}}
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

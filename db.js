@@ -63,6 +63,7 @@ module.exports.setupDb = function () {
 module.exports.recordScrum = function (processedScrum) {
     client.index({
         index: "scrum",
+        id: processedScrum.startTime,
         type: "conversation",
         body: processedScrum
     }, function (err, response) {
@@ -81,6 +82,39 @@ module.exports.thisWeekScrums = function () {
         body: ejs.Request()
             .query(ejs.RangeQuery("startTime", {gte: "now/w"}))
     }).then(function (response) {
+        return _.pluck(response.hits.hits, "_source").reverse();
+    });
+};
+
+module.exports.scrumsWithIssue = function (key) {
+    return client.search({
+        index: "scrum",
+        body: ejs.Request()
+            .query(ejs.TermQuery("issues", key))
+    }).then(function (response) {
         return _.pluck(response.hits.hits, "_source");
+    });
+};
+
+module.exports.scrum = function (startTime) {
+    return client.search({
+        index: "scrum",
+        body: ejs.Request()
+            .query(ejs.TermQuery("startTime", startTime))
+    }).then(function (response) {
+        return response.hits.hits[0]["_source"];
+    });
+};
+
+module.exports.scrumsBetween = function (startTime, endTime) {
+    return client.search({
+        index: "scrum",
+        body: ejs.Request()
+            .query(ejs.BoolQuery()
+                .must(ejs.RangeQuery("startTime").gte(startTime))
+                .must(ejs.RangeQuery("startTime").lte(endTime))
+            )
+    }).then(function (response) {
+        return _.pluck(response.hits.hits, "_source").reverse();
     });
 }

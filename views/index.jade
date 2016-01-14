@@ -1,6 +1,10 @@
 extends layout
 
 block content
-    div(ng-app="scrum", ng-controller="IndexController")
-        ng-include(src="'partials/index.html'")
+    div(ng-app="scrum")
+        nav.navbar.navbar-default
+            div.container-fluid
+                div.navbar-header
+                    a.navbar-brand(ui-sref="index") #OpenMRS Scrum Notes Browser
+        ui-view
     script(src="/javascripts/index.js")

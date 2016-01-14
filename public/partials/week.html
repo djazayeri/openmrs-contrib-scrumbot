@@ -1,0 +1,23 @@
+<h3>
+    <a ui-sref="week({startDate: prevWeek})">
+        <span class="glyphicon glyphicon-arrow-left"></span>
+    </a>
+    Week from {{start | date}} to {{end | date}}
+    <a ng-show="nextWeek" ui-sref="week({startDate: nextWeek})">
+        <span class="glyphicon glyphicon-arrow-right"></span>
+    </a>
+
+    <div class="label label-info pull-right">
+        <a target="_blank" href="https://botbot.me/freenode/openmrs/{{start.format('YYYY-MM-DD')}}">
+            Full IRC logs
+            <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+        </a>
+    </div>
+</h3>
+
+<div ng-repeat="scrum in week" ng-include="'partials/displayScrum.html'">
+</div>
+
+<span ng-show="!week.length">
+    No scrums recorded
+</span>
