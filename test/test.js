@@ -33,7 +33,7 @@ describe('Processor', function () {
             var conv = [
                 {
                     from: "djazayeri",
-                    message: "ABC-123: found this bug and completed it",
+                    message: "ABC-123: found this bug and completed it (see link/to/ABC-123)",
                     timestamp: moment().subtract(2, 'minutes').toISOString()
                 },
                 {

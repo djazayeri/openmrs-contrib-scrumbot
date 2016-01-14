@@ -25,7 +25,7 @@ module.exports = {
                 startTime: _.first(conversation).timestamp,
                 endTime: _.last(conversation).timestamp,
                 participants: _.uniq(_.pluck(conversation, "from")),
-                issues: _.chain(processed).pluck("issues").flatten().remove(null).value()
+                issues: _.chain(processed).pluck("issues").flatten().remove(null).uniq().value()
             });
         }
         else {
