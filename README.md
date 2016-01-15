@@ -43,8 +43,7 @@ Note: this approach uses LINK networking, which will eventually be deprecated in
 
 ### ES for prod on a Digital Ocean one-click app Docker box (don't expose ElasticSearch to the outside world, since it isn't secured)
 
-    // TO DO, need to set things up to preserve the data across restarts of the ES container
-    $ docker run --name es -d elasticsearch
+    $ docker run -d --name es -v "$PWD/esdata":/usr/share/elasticsearch/data -p 127.0.0.1:9200:9200 elasticsearch
     
 ### build docker image
 
@@ -53,5 +52,6 @@ Note: this approach uses LINK networking, which will eventually be deprecated in
     
 ### run webapp+bot on docker on Digital Ocean
 
+    // this is automated as ./update-web 1.2
     $ docker rm web
     $ docker run -d -p 80:3000 --name web --link es:es -e "elasticsearch:host=http://es:9200" djazayeri/openmrs-scrumbot:1.0
