@@ -15,6 +15,9 @@ nconf
         },
         elasticsearch: {
             host: "localhost:9200"
+        },
+        processor: {
+            issueRegex: "[A-Z]{2,10}-\\d{1,6}"
         }
     });
 

@@ -2,8 +2,9 @@ var _ = require("lodash");
 
 var log = require("./log");
 var db = require("./db");
+var config = require("./config");
 
-var issueKeyRegex = /[A-Z]{3,10}-\d{1,6}/g;
+var issueKeyRegex = new RegExp(config.get("processor").issueRegex, "g");
 
 var processMessage = function (msg) {
     var message = msg.message;

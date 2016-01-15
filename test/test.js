@@ -42,6 +42,11 @@ describe('Processor', function () {
                     timestamp: moment().subtract(1, 'minutes').toISOString()
                 },
                 {
+                    from: "jdegraft",
+                    message: "- RA-968: appframework build for OpenMRS 2.0 platform - changes following review",
+                    timestamp: moment().subtract(1, 'minutes').toISOString()
+                },
+                {
                     from: "wluyima",
                     message: "I organized a sprint",
                     timestamp: moment().toISOString()
@@ -52,9 +57,9 @@ describe('Processor', function () {
             var calledWith = db.recordScrum.firstCall.args[0];
             calledWith.should.have.property("raw").equal(conv);
             calledWith.startTime.should.equal(conv[0].timestamp);
-            calledWith.endTime.should.equal(conv[2].timestamp);
-            calledWith.participants.should.deep.equal(["djazayeri", "wluyima"]);
-            calledWith.issues.should.deep.equal(["ABC-123", "DEF-456"]);
+            calledWith.endTime.should.equal(conv[3].timestamp);
+            calledWith.participants.should.deep.equal(["djazayeri", "jdegraft", "wluyima"]);
+            calledWith.issues.should.deep.equal(["ABC-123", "DEF-456", "RA-968"]);
         });
         after(function (done) {
             db.recordScrum.restore();
