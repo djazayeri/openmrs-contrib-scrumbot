@@ -45,7 +45,7 @@ Note: this approach uses LINK networking, which will eventually be deprecated in
 
     $ docker run -d --name es -v "$PWD/esdata":/usr/share/elasticsearch/data -p 127.0.0.1:9200:9200 elasticsearch
     
-### build docker image
+### build docker image on dev machine
 
     $ docker build -t djazayeri/openmrs-scrumbot:1.0 .   // remember to change the version number tag
     $ docker push djazayeri/openmrs-scrumbot
