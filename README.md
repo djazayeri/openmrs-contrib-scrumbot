@@ -53,5 +53,6 @@ Note: this approach uses LINK networking, which will eventually be deprecated in
 ### run webapp+bot on docker on Digital Ocean
 
     // this is automated as ./update-web 1.2
+    $ docker pull djazayeri/openmrs-scrumbot:1.2
     $ docker rm web
     $ docker run -d -p 80:3000 --name web --link es:es -e "elasticsearch:host=http://es:9200" djazayeri/openmrs-scrumbot:1.0
