@@ -1,0 +1,22 @@
+<h3>Upload a past scrum (copy-paste a TSV of from, message, timestamp (hh:mm:ss aa))</h3>
+
+<textarea ng-model="input" rows="5" cols="80"></textarea>
+
+<p>
+    Date: <input type="date" ng-model="date" required/>
+</p>
+
+<div ng-show="toUpload">
+    <h3>Is this right?</h3>
+    <table class="table">
+        <tr ng-repeat="line in toUpload">
+            <td>{{line.from}}</td>
+            <td>{{line.message}}</td>
+            <td>{{line.timestamp}}</td>
+        </tr>
+    </table>
+
+    <br/><br/>
+
+    <button class="btn btn-warning" ng-disabled="!(date && toUpload.length)" ng-click="doUpload()">Do Upload</button>
+</div>

@@ -114,7 +114,8 @@ module.exports.scrumsBetween = function (startTime, endTime) {
                 .must(ejs.RangeQuery("startTime").gte(startTime))
                 .must(ejs.RangeQuery("startTime").lte(endTime))
             )
+            .sort(ejs.Sort("startTime").desc())
     }).then(function (response) {
-        return _.pluck(response.hits.hits, "_source").reverse();
+        return _.pluck(response.hits.hits, "_source");
     });
 }

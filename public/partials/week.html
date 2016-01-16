@@ -6,14 +6,48 @@
     <a ng-show="nextWeek" ui-sref="week({startDate: nextWeek})">
         <span class="glyphicon glyphicon-arrow-right"></span>
     </a>
-
-    <div class="label label-info pull-right">
-        <a target="_blank" href="https://botbot.me/freenode/openmrs/{{start.format('YYYY-MM-DD')}}">
-            Full IRC logs
-            <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
-        </a>
-    </div>
 </h3>
+
+<div class="panel panel-primary">
+    <div class="panel-heading ">
+        <span class="label label-warning pull-right">
+            <a target="_blank" href="https://botbot.me/freenode/openmrs/{{start.format('YYYY-MM-DD')}}">
+                Full IRC logs
+                <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+            </a>
+        </span>
+        <h3 class="panel-title">
+            <span ng-pluralize count="week.length" when="{'one':'{} scrum', 'other':'{} scrums'}"></span>
+            <small>
+                Shortest: {{summary.shortest | scrumDuration}},
+                Longest: {{summary.longest | scrumDuration}}
+            </small>
+        </h3>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Participants</th>
+            <th>Issues</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <div ng-repeat="obj in summary.participants">
+                    {{obj.val}} ({{obj.count}}x)
+                </div>
+            </td>
+            <td>
+                <div ng-repeat="obj in summary.issues">
+                    <a ui-sref="issue({ issueKey: obj.val})">{{obj.val}}</a> ({{obj.count}}x)
+                    <span ng-repeat="label in issueLabels(obj.val)">{{label}}</span>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
 <div ng-repeat="scrum in week" ng-include="'partials/displayScrum.html'">
 </div>

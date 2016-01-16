@@ -13,9 +13,11 @@
                 <tr>
                     <th>Participants</th>
                     <td>
-                        <span ng-repeat="p in scrum.participants">
-                            {{ p }}
-                        </span>
+                        <ul class="list-unstyled">
+                            <li ng-repeat="p in scrum.participants">
+                                {{ p }}
+                            </li>
+                        </ul>
                     </td>
                 </tr>
                 <tr>
@@ -32,10 +34,11 @@
             </table>
         </div>
         <div class="col-md-8">
-            <ul>
+            <ul class="list-unstyled">
                 <li ng-repeat="line in scrum.raw">
-                    <small>{{line.timestamp | time}}</small>
-                    | {{line.from}} | {{line.message}}
+                    <small>{{line.timestamp | time}} |</small>
+                    <span>{{line.from}} |</span>
+                    <span ng-class="classes(line)">{{line.message}}</span>
                 </li>
             </ul>
         </div>
