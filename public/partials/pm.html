@@ -1,0 +1,65 @@
+<h5>Tickets in "Ready For Work" or "Waiting For Dev"</h5>
+
+<div class="row">
+    <div class="col-md-4">
+        <summary-issue-list title="Community Priority" issues="status['community-priority']"></summary-issue-list>
+    </div>
+
+    <div class="col-md-4">
+        <summary-issue-list title="Curated" issues="status['curated']"></summary-issue-list>
+    </div>
+
+    <div class="col-md-4">
+        <summary-issue-list title="Intro" issues="status['intro']"></summary-issue-list>
+    </div>
+</div>
+
+<br/>
+
+<div class="row">
+    <h3>Community Priority Tickets</h3>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Assignee</th>
+            <th ng-repeat="g in statusGroups">{{g.name}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="a in priorityAssignees">
+            <td>
+                {{a.displayName}}
+            </td>
+            <td ng-repeat="s in statusGroups">
+                <div ng-repeat="issue in issuesFor(priorityIssues.issues, a.name, s)" class="pm-ticket"
+                     ng-class="classes(issue)">
+                    <a target="_blank" href="https://issues.openmrs.org/browse/{{issue.key}}">
+                        {{ issue.key }}
+                    </a>
+                    - {{issue.fields.status.name}}
+                    - updated {{issue.fields.updated | prettyDate}}
+                    <br/>
+                    <small>{{ issue.fields.summary }}</small>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Unassigned
+            </td>
+            <td ng-repeat="s in statusGroups">
+                <div ng-repeat="issue in issuesFor(priorityIssues.issues, null, s)" class="pm-ticket"
+                     ng-class="classes(issue)">
+                    <a target="_blank" href="https://issues.openmrs.org/browse/{{issue.key}}">
+                        {{ issue.key }}
+                    </a>
+                    - {{issue.fields.status.name}}
+                    - updated {{issue.fields.updated | prettyDate}}
+                    <br/>
+                    <small>{{ issue.fields.summary }}</small>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

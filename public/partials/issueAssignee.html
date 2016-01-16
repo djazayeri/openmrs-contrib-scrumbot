@@ -1,0 +1,4 @@
+<span ng-show="issue && issue.assignee" class="label label-success">
+    <img ng-show="issue.assignee.avatarUrls['16x16']" src="{{ issue.assignee.avatarUrls['16x16'] }}"/>
+    {{ issue.assignee.displayName }}
+</span>

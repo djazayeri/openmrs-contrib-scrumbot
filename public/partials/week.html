@@ -40,8 +40,12 @@
             </td>
             <td>
                 <div ng-repeat="obj in summary.issues">
-                    <a ui-sref="issue({ issueKey: obj.val})">{{obj.val}}</a> ({{obj.count}}x)
-                    <span ng-repeat="label in issueLabels(obj.val)">{{label}}</span>
+                    {{obj.count}}x: <a ui-sref="issue({ issueKey: obj.val})">{{obj.val}}</a>
+                    - {{ issues[obj.val].summary }}
+                    <issue-status issue="issues[obj.val]"></issue-status>
+                    <issue-assignee issue="issues[obj.val]"></issue-assignee>
+                    <span class="label label-default" ng-repeat="label in issues[obj.val].labels">{{label}}</span>
+                    <span class="label label-default" ng-repeat="label in issues[obj.val].labels">{{label}}</span>
                 </div>
             </td>
         </tr>

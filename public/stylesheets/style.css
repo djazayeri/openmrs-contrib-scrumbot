@@ -1,3 +1,21 @@
 .blocker {
     font-weight: bold;
 }
+
+.label {
+    margin-right: 5px;
+}
+
+.warn {
+    background-color: lightyellow;
+    /*font-weight: bold;*/
+}
+
+.warn-strong {
+    background-color: orange;
+    /*font-weight: bold;*/
+}
+
+.pm-ticket {
+    margin-bottom: 5px;
+}
