@@ -16,9 +16,14 @@
 
 <br/>
 
-<div class="row">
-    <h3>Community Priority Tickets</h3>
-    <table class="table">
+<div>
+    <h3>Project Management Overview of JIRA Issues</h3>
+    <form ng-submit="jiraQuery(jqlQuery)">
+        <input type="text" ng-model="jqlQuery" size="60" ng-change="jiraError = null"/>
+        <button type="submit">Query</button>
+        <span class="text-danger" ng-show="jiraError">{{jiraError.data.response.body.errorMessages}}</span>
+    </form>
+    <table class="table" ng-show="jiraResults">
         <thead>
         <tr>
             <th>Assignee</th>
@@ -26,12 +31,12 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="a in priorityAssignees">
+        <tr ng-repeat="a in assignees">
             <td>
                 {{a.displayName}}
             </td>
             <td ng-repeat="s in statusGroups">
-                <div ng-repeat="issue in issuesFor(priorityIssues.issues, a.name, s)" class="pm-ticket"
+                <div ng-repeat="issue in issuesFor(jiraResults.issues, a.name, s)" class="pm-ticket"
                      ng-class="classes(issue)">
                     <a target="_blank" href="https://issues.openmrs.org/browse/{{issue.key}}">
                         {{ issue.key }}
@@ -48,7 +53,7 @@
                 Unassigned
             </td>
             <td ng-repeat="s in statusGroups">
-                <div ng-repeat="issue in issuesFor(priorityIssues.issues, null, s)" class="pm-ticket"
+                <div ng-repeat="issue in issuesFor(jiraResults.issues, null, s)" class="pm-ticket"
                      ng-class="classes(issue)">
                     <a target="_blank" href="https://issues.openmrs.org/browse/{{issue.key}}">
                         {{ issue.key }}

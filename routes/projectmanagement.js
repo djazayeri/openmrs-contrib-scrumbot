@@ -26,4 +26,14 @@ router.get('/communitypriority', function (req, res) {
         });
 });
 
+router.get("/jiraquery", function (req, res) {
+    jira.query(req.query.jql, {maxResults: 50})
+        .then(function (response) {
+            res.send(response);
+        })
+        .catch(function (err) {
+            res.status(400).send(err);
+        })
+});
+
 module.exports = router;

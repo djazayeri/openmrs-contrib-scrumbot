@@ -221,11 +221,16 @@ angular.module("scrum", ["ngResource", "ui.router"])
         $http.get("projectmanagement/status").then(function (response) {
             $scope.status = response.data;
         });
-        $http.get("projectmanagement/communitypriority").then(function (response) {
-            $scope.priorityAssignees = _.chain(response.data.issues).map("fields.assignee").uniqBy("name").remove(null).value();
 
-            $scope.priorityIssues = response.data;
-        });
+        $scope.jqlQuery = "labels = 'community-priority' and resolution is empty";
+        $scope.jiraQuery = function (jql) {
+            $http.get("projectmanagement/jiraquery?jql=" + encodeURIComponent(jql)).then(function (response) {
+                $scope.assignees = _.chain(response.data.issues).map("fields.assignee").uniqBy("name").remove(null).value();
+                $scope.jiraResults = response.data;
+            }).catch(function (err) {
+                $scope.jiraError = err;
+            });
+        }
         $scope.classes = function (issue) {
             var ret = [];
             var lastUpdateCutoff = statusGroupFor(issue).warnAfterDays;
