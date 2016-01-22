@@ -11,7 +11,8 @@ nconf
             channel: "#openmrs",
             nick: "omrs-scrum-bot",
             startListening: "!scrumon",
-            stopListening: "!scrumoff"
+            stopListening: "!scrumoff",
+            sayBuildFailures: "!scrumon"
         },
         elasticsearch: {
             host: "localhost:9200"

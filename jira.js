@@ -6,13 +6,7 @@ var config = require('./config');
 function getJson(uri) {
     return rp({
         uri: uri,
-        transform: function (body) {
-            try {
-                return JSON.parse(body);
-            } catch (ex) {
-                return ex
-            }
-        }
+        json: true
     });
 }
 
