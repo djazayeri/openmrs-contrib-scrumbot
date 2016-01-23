@@ -109,10 +109,10 @@ angular.module("scrum", ["ngResource", "ui.router"])
                 participants: transformAndSort(_.countBy(_.flatten(_.map(week, 'participants')))),
                 issues: transformAndSort(_.countBy(_.flatten(_.map(week, 'issues')))),
                 shortest: _.minBy(week, function (scrum) {
-                    return moment(scrum.startTime).diff(scrum.endTime, 'minutes')
+                    return moment(scrum.endTime).diff(scrum.startTime)
                 }),
                 longest: _.maxBy(week, function (scrum) {
-                    return moment(scrum.startTime).diff(scrum.endTime, 'minutes')
+                    return moment(scrum.endTime).diff(scrum.startTime)
                 })
             };
             loadIssues(summary.issues);
