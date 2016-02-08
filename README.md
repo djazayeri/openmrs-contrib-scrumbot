@@ -45,11 +45,10 @@ Note: this approach uses LINK networking, which will eventually be deprecated in
 
     $ docker run -d --restart="unless-stopped" --name es -v "$PWD/esdata":/usr/share/elasticsearch/data -p 127.0.0.1:9200:9200 elasticsearch
     
-### build docker image on dev machine
+### dockerhub does builds automatically
 
-    $ docker build -t djazayeri/openmrs-scrumbot:1.0 .   // remember to change the version number tag
-    $ docker push djazayeri/openmrs-scrumbot
-    
+Whenever you commit code to this repository it is automatically built as djazayeri/openmrs-contrib-scrumbot:latest 
+
 ### run webapp+bot on docker on Digital Ocean
 
     // this is automated as ./update-web
