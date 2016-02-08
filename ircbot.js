@@ -29,12 +29,24 @@ client.addListener('error', function (message) {
     log.error(message);
 });
 
+function shouldStartListening(message) {
+    return message.startsWith(START_LISTENING);
+}
+
+function shouldStopListening(message) {
+    return message.startsWith(STOP_LISTENING);
+}
+
+function shouldListBuildFailures(message) {
+    return message.startsWith(SAY_BUILD_FAILURES);
+}
+
 client.addListener('message', function (from, to, message) {
     log.trace(from + ' => ' + to + ': ' + message);
     if (to == NICK) {
         // it's a PM
     }
-    if (message === START_LISTENING) {
+    if (shouldStartListening(message)) {
         if (listeningNow) {
             log.warn("Was already listening, and told to start listening again");
         }
@@ -43,7 +55,7 @@ client.addListener('message', function (from, to, message) {
             conversation = [];
         }
     }
-    else if (message === STOP_LISTENING) {
+    else if (shouldStopListening(message)) {
         listeningNow = false;
         processor.processScrum(conversation);
         conversation = null;
@@ -57,7 +69,7 @@ client.addListener('message', function (from, to, message) {
             timestamp: moment().toISOString()
         });
     }
-    if (message === SAY_BUILD_FAILURES) {
+    if (shouldListBuildFailures(message)) {
         postMessage("Wait a moment while I check on CI for broken builds.");
         bamboo.summarizeBrokenBuilds().then(function (summary) {
             _.each(summary, function (line) {
@@ -67,4 +79,7 @@ client.addListener('message', function (from, to, message) {
     }
 });
 
+module.exports.shouldStartListening = shouldStartListening;
+module.exports.shouldStopListening = shouldStopListening;
+module.exports.shouldListBuildFailures = shouldListBuildFailures;
 module.exports.postMessage = postMessage;

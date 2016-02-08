@@ -2,6 +2,7 @@ require('chai').should();
 var sinon = require('sinon');
 var moment = require("moment");
 var processor = require("../processor");
+var ircbot = require("../ircbot");
 var db = require("../db");
 
 describe('Processor', function () {
@@ -64,6 +65,28 @@ describe('Processor', function () {
         after(function (done) {
             db.recordScrum.restore();
             done();
+        });
+    });
+});
+
+describe("IRC Bot", function () {
+    describe("shouldStartListening", function () {
+        it("should recognize !scrumon", function () {
+            ircbot.shouldStartListening("!scrumon").should.equal(true);
+        });
+        it("should recognize !scrumon username", function () {
+            ircbot.shouldStartListening("!scrumon rafa").should.equal(true);
+        });
+        it("should not recognize other things", function () {
+            ircbot.shouldStartListening("!something else").should.equal(false);
+        });
+    });
+    describe("shouldStopListening", function () {
+        it("should recognize !scrumoff", function () {
+            ircbot.shouldStopListening("!scrumoff").should.equal(true);
+        });
+        it("should not recognize other things", function () {
+            ircbot.shouldStopListening("!foobar").should.equal(false);
         });
     });
 });
