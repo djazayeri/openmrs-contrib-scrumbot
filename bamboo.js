@@ -46,9 +46,11 @@ module.exports.summarizeBrokenBuilds = function () {
                     }
                 });
                 say.push("Please assign someone to deal with this failures!");
+                say.broken = true;
             }
             else {
                 say.push("All CI builds are passing. Congratulations!");
+                say.broken = false;
             }
             return say;
         }

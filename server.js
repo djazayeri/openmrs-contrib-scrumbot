@@ -37,6 +37,7 @@ app.use('/scrum', require('./routes/scrum'));
 app.use('/scrums', require('./routes/scrums'));
 app.use('/projectmanagement', require('./routes/projectmanagement'));
 app.use('/upload', require('./routes/upload'));
+app.use('/ci', require('./routes/ci'));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

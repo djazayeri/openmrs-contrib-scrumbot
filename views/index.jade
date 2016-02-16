@@ -3,8 +3,13 @@ extends layout
 block content
     div(ng-app="scrum")
         nav.navbar.navbar-default
-            div.container-fluid
-                div.navbar-header
-                    a.navbar-brand(ui-sref="index") #OpenMRS Scrum Notes Browser
+            div.navbar-header
+                span.navbar-brand OpenMRS PM
+            div.collapse.navbar-collapse
+                ul.nav.navbar-nav
+                    li
+                        a(ui-sref="pm") PM Overview
+                    li
+                        a(ui-sref="thisweek") Scrum Overview
         ui-view
     script(src="/javascripts/index.js")

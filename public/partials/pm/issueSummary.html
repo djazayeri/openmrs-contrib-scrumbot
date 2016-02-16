@@ -1,4 +1,5 @@
 <a target="_blank" href="https://issues.openmrs.org/browse/{{issue.key}}">
     {{ issue.key }}
 </a>
-<small>- {{ issue.fields.summary }}</small>
+<small class="label label-default">{{ issue.fields.status.name }}</small>
+<small>{{ issue.fields.summary }}</small>

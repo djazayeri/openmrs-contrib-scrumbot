@@ -1,4 +1,20 @@
-<h4>{{ title }}</h4>
-<h1>{{issues.total}}</h1>
-<p ng-repeat="issue in issues.issues" ng-include="'partials/pm/issueSummary.html'"></p>
-<p ng-show="issues.total > issues.maxResults">...and {{issues.total - issues.maxResults}} more</p>
+<h4 ng-class="{'text-danger':check().error, 'text-success':!check().error}">
+    {{ opts.title }}
+    <span ng-hide="opts.bigNumber || opts.loading">({{opts.issues.total}})</span>
+</h4>
+<h2 class="text-muted" ng-show="opts.loading">Loading...</h2>
+<h1 ng-show="opts.bigNumber" ng-hide="opts.loading" ng-class="{'text-danger':check().error, 'text-success':!check().error}">
+    {{opts.issues.total}}
+    <span ng-show="check().error" class="small">
+        <i class="glyphicon glyphicon-warning-sign"></i>
+        {{ check().message }}
+    </span>
+    <span ng-hide="check().error" class="small">
+        {{ check().message }}
+    </span>
+</h1>
+<p ng-repeat="issue in opts.issues.issues|limitTo:opts.showNum" ng-include="'partials/pm/issueSummary.html'"></p>
+<p ng-show="opts.showNum > 0 && opts.showNum < opts.issues.total" class="text-muted">
+    ...and {{opts.issues.total - opts.showNum}} more.
+</p>
+<a target="_blank" href="{{ opts.jql|jiraLink }}">View in JIRA</a>

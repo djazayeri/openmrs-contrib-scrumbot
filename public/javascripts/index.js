@@ -5,6 +5,12 @@ angular.module("scrum", ["ngResource", "ui.router"])
             .state("index", {
                 url: "/index",
                 controller: ["$state", function ($state) {
+                    $state.go("pm");
+                }]
+            })
+                .state("thisweek", {
+                    url: "/week",
+                    controller: ["$state", function ($state) {
                     $state.go("week", {startDate: moment().startOf("week").toISOString()});
                 }]
             })
@@ -58,6 +64,11 @@ angular.module("scrum", ["ngResource", "ui.router"])
             return diff + (diff === 1 ? " minute" : " minutes");
         }
     }])
+        .filter("jiraLink", [function () {
+            return function (jql) {
+                return "https://issues.openmrs.org/issues/?jql=" + encodeURIComponent(jql);
+            }
+        }])
     .directive("issueStatus", [function () {
         return {
             restrict: "E",
@@ -81,8 +92,26 @@ angular.module("scrum", ["ngResource", "ui.router"])
             restrict: "E",
             scope: {
                 title: "@",
-                issues: "="
+                opts: "="
             },
+            controller: ["$scope", function ($scope) {
+                $scope.check = function () {
+                    var expected = "";
+                    if ($scope.opts.minExpected && $scope.opts.maxExpected) {
+                        expected = "Expected " + $scope.opts.minExpected + "-" + $scope.opts.maxExpected;
+                    } else if ($scope.opts.minExpected) {
+                        expected = "Expected >=" + $scope.opts.minExpected;
+                    } else if ($scope.opts.maxExpected) {
+                        expected = "Expected <=" + $scope.opts.maxExpected;
+                    }
+                    var error = ($scope.opts.minExpected && $scope.opts.issues.total < $scope.opts.minExpected) ||
+                                ($scope.opts.maxExpected && $scope.opts.issues.total > $scope.opts.maxExpected);
+                    return {
+                        error: error,
+                        message: expected
+                    };
+                }
+            }],
             templateUrl: "partials/pm/issueList.html"
         }
     }])
@@ -156,31 +185,40 @@ angular.module("scrum", ["ngResource", "ui.router"])
         });
     }])
     .controller("PmController", ["$scope", "$http", function ($scope, $http) {
+        $scope.brokenBuilds = {loading: true};
+        $http.get("ci/brokenbuilds").then(function (response) {
+            $scope.brokenBuilds = response.data;
+        });
+        var needsAttentionStatuses = [
+            'Cancelled',
+            'Awaiting Approval',
+            'Needs Assessment',
+            'Under Assessment',
+            'Waiting for Analysis',
+            'Waiting on Information',
+            'In Analysis',
+            'Design',
+            'In Backlog',
+            'Reopened',
+            // statuses that shouldn't happen for a priority ticket with resolution=empty
+            'Resolved',
+            'Closed',
+            'Approved',
+            'Accepted'
+        ];
         $scope.statusGroups = [
             {
                 name: "Needs Attention",
-                warnAfterDays: 0,
-                statuses: [
-                    'Cancelled',
-                    'Awaiting Approval',
-                    'Needs Assessment',
-                    'Under Assessment',
-                    'Waiting for Analysis',
-                    'Waiting on Information',
-                    'In Analysis',
-                    'Design',
-                    'In Backlog',
-                    'Reopened',
-                    // statuses that shouldn't happen for a priority ticket with resolution=empty
-                    'Resolved',
-                    'Closed',
-                    'Approved',
-                    'Accepted'
-                ]
+                warnAfterDays: 0.1,
+                mode: "list",
+                show: true,
+                statuses: needsAttentionStatuses
             },
             {
                 name: "Ready For Work",
-                warnAfterDays: 14,
+                warnAfterDays: 30,
+                mode: "list",
+                show: false,
                 statuses: [
                     'Ready for Work',
                     'Waiting for Dev',
@@ -190,6 +228,7 @@ angular.module("scrum", ["ngResource", "ui.router"])
             {
                 name: "Working",
                 warnAfterDays: 7,
+                mode: "table",
                 statuses: [
                     'In Progress',
                     'In Development',
@@ -199,6 +238,7 @@ angular.module("scrum", ["ngResource", "ui.router"])
             {
                 name: "Review/Testing",
                 warnAfterDays: 7,
+                mode: "table",
                 statuses: [
                     'Code Review (Pre-Commit)',
                     'Code Review (Initial)',
@@ -218,9 +258,53 @@ angular.module("scrum", ["ngResource", "ui.router"])
             })
         }
 
-        $http.get("projectmanagement/status").then(function (response) {
-            $scope.status = response.data;
+        $scope.queryHasIssues = {};
+        function doJiraQuery(name, title, jql, opts) {
+            $scope[name] = {loading: true, title: title};
+            $http.get("projectmanagement/jiraquery?jql=" + encodeURIComponent(jql)).then(function (response) {
+                $scope[name] = angular.extend({
+                                                  title: title,
+                                                  issues: response.data,
+                                                  jql: jql
+                                              }, opts);
+                $scope.queryHasIssues[name] = response.data.total ? $scope[name] : null;
+            });
+        }
+
+        doJiraQuery("availableCommunityPriority",
+                    "Available Community Priority",
+                    'labels = community-priority AND status in ("Ready for Work", "Waiting for Dev") ORDER BY Rank', {
+                        showNum: 0,
+                        bigNumber: true,
+                        minExpected: 5,
+                        maxExpected: 15
         });
+
+        doJiraQuery("availableCuratedIntro",
+                    "Available Curated Intro",
+                    'labels = "intro" AND labels = "curated" AND status in ("Ready for Work", "Waiting for Dev")', {
+                        showNum: 0,
+                        bigNumber: true,
+                        minExpected: 10
+                    });
+
+        doJiraQuery("communityPriorityNeedsAttention",
+                    "Community-Priority",
+                    'labels = "community-priority" AND resolution is empty AND status in (' +
+                    _.map(needsAttentionStatuses, function (it) {
+                        return '"' + it + '"'
+                    }).join(",") +
+                    ')', {
+                        showNum: 5,
+                        bigNumber: false
+                    });
+
+        $scope.alertKeys = ["communityPriorityNeedsAttention"];
+        $scope.anyAlerts = function () {
+            return _.some($scope.alertKeys, function (key) {
+                return $scope.queryHasIssues[key];
+            });
+        }
 
         $scope.jqlQuery = "labels = 'community-priority' and resolution is empty";
         $scope.jiraQuery = function (jql) {
@@ -231,6 +315,9 @@ angular.module("scrum", ["ngResource", "ui.router"])
                 $scope.jiraError = err;
             });
         }
+        // trigger it at page load
+        $scope.jiraQuery($scope.jqlQuery);
+
         $scope.classes = function (issue) {
             var ret = [];
             var lastUpdateCutoff = statusGroupFor(issue).warnAfterDays;
@@ -242,13 +329,18 @@ angular.module("scrum", ["ngResource", "ui.router"])
             }
             return ret;
         }
-        $scope.issuesFor = function (issues, assignee, statusGroup) {
+        $scope.issuesFor = function (issues, statusGroup) {
             return _.filter(issues, function (i) {
-                return (_.indexOf(statusGroup.statuses, i.fields.status.name) >= 0) && (
-                        (assignee && i.fields.assignee && i.fields.assignee.name == assignee)
-                        || (!assignee && !i.fields.assignee)
-                    );
+                return _.indexOf(statusGroup.statuses, i.fields.status.name) >= 0;
             });
+        }
+        $scope.issuesInWorkTable = function (issues) {
+            var groups = _.filter($scope.statusGroups, {mode: 'table'});
+            var count = 0;
+            _.each(groups, function (group) {
+                count += $scope.issuesFor(issues, group).length;
+            });
+            return count;
         }
     }])
     .controller("UploadController", ["$scope", "$http", function ($scope, $http) {
