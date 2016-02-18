@@ -23,61 +23,23 @@
         <summary-issue-list opts="queryHasIssues[alertKey]"></summary-issue-list>
     </div>
 </div>
+
 <hr/>
 
 <div class="row">
     <div class="col-md-12">
-        <h3>Project Management Overview of JIRA Issues</h3>
-        <form ng-submit="jiraQuery(jqlQuery)">
-            <input type="text" ng-model="jqlQuery" size="60" ng-change="jiraError = null"/>
-            <button type="submit">Query</button>
-            <span class="text-danger" ng-show="jiraError">{{jiraError.data.response.body.errorMessages}}</span>
-        </form>
-    </div>
-</div>
-
-<div class="row" ng-repeat="s in statusGroups|filter:{mode:'list'}">
-    <h4 class="col-md-12">
-        {{s.name}} ({{issuesFor(jiraResults.issues, s).length}})
-        <a ng-click="s.show = !s.show">(show/hide)</a>
-    </h4>
-    <div ng-repeat="issue in issuesFor(jiraResults.issues, s) | orderBy:'fields.updated'" class="pm-ticket col-md-4"
-         ng-class="classes(issue)" ng-show="s.show">
-        <a target="_blank" href="https://issues.openmrs.org/browse/{{issue.key}}">
-            {{ issue.key }}
-        </a>
-        - {{issue.fields.status.name}}
-        <span class="text-muted">- updated {{issue.fields.updated | prettyDate}}</span>
-        <br/>
-        <small>{{ issue.fields.summary }}</small>
+        <release-summary opts="platform1dot12release"></release-summary>
     </div>
 </div>
 
 <div class="row">
-    <h4 class="col-md-12">
-        In progress ({{issuesInWorkTable(jiraResults.issues)}})
-    </h4>
-    <table class="table">
-        <thead>
-        <tr>
-            <th ng-repeat="g in statusGroups|filter:{mode:'table'}">{{g.name}}</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td ng-repeat="s in statusGroups|filter:{mode:'table'}">
-                <div ng-repeat="issue in issuesFor(jiraResults.issues, s)" class="pm-ticket"
-                     ng-class="classes(issue)">
-                    <a target="_blank" href="https://issues.openmrs.org/browse/{{issue.key}}">
-                        {{ issue.key }}
-                    </a>
-                    - {{issue.fields.status.name}} - {{ issue.fields.assignee.displayName }}
-                    <span class="text-muted">- updated {{issue.fields.updated | prettyDate}}</span>
-                    <br/>
-                    <small>{{ issue.fields.summary }}</small>
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="col-md-12">
+        <release-summary opts="platform2dot0release"></release-summary>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <release-summary opts="refapp2dot4release"></release-summary>
+    </div>
 </div>

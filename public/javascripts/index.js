@@ -1,4 +1,144 @@
-angular.module("scrum", ["ngResource", "ui.router"])
+angular.module("scrum", ["ngResource", "ui.router", "nvd3"])
+        .constant("needsAttentionStatuses", [
+            'Cancelled',
+            'Awaiting Approval',
+            'Needs Assessment',
+            'Under Assessment',
+            'Waiting for Analysis',
+            'Waiting on Information',
+            'In Analysis',
+            'Design',
+            'In Backlog',
+            'Reopened',
+            // statuses that shouldn't happen for a priority ticket with resolution=empty
+            'Resolved',
+            'Closed',
+            'Approved',
+            'Accepted'
+        ])
+        .factory("releaseStatusGroups", [function () {
+            return [
+                {
+                    name: "Backlog",
+                    color: "red",
+                    statuses: [
+                        'Needs Assessment',
+                        'Under Assessment',
+                        'In Backlog'
+                    ]
+                },
+                {
+                    name: "Design/Analysis",
+                    color: "yellow",
+                    statuses: [
+                        'Waiting for Analysis',
+                        'Waiting on Information',
+                        'In Analysis',
+                        'Design',
+                        'Reopened'
+                    ]
+                },
+                {
+                    name: "Ready",
+                    color: "lightGray",
+                    statuses: [
+                        'Ready for Work',
+                        'Waiting for Dev',
+                        'Open'
+                    ]
+                },
+                {
+                    name: "Progress",
+                    color: "darkGray",
+                    statuses: [
+                        'In Progress',
+                        'In Development',
+                        'Implementing Change'
+                    ]
+                },
+                {
+                    name: "Review/Test",
+                    color: "blue",
+                    statuses: [
+                        'Awaiting Approval',
+                        'Code Review (Pre-Commit)',
+                        'Code Review (Initial)',
+                        'Code Review (Post-Commit)',
+                        'Waiting for Test',
+                        'In Test',
+                        'Under Review',
+                        'Reviewing Change',
+                        'Monitoring Change'
+                    ]
+                },
+                {
+                    name: "Complete",
+                    color: "green",
+                    statuses: [
+                        'Waiting for Showcase'
+                    ]
+                },
+                {
+                    name: "Finished",
+                    color: "green",
+                    statuses: [
+                        'Cancelled',
+                        'Resolved',
+                        'Closed',
+                        'Approved',
+                        'Accepted'
+                    ]
+                }
+            ]
+        }])
+        .factory("statusGroups", ["needsAttentionStatuses", function (needsAttentionStatuses) {
+            return [
+                {
+                    name: "Needs Attention",
+                    warnAfterDays: 0.1,
+                    mode: "list",
+                    show: true,
+                    statuses: needsAttentionStatuses
+                },
+                {
+                    name: "Ready For Work",
+                    warnAfterDays: 30,
+                    mode: "list",
+                    show: false,
+                    statuses: [
+                        'Ready for Work',
+                        'Waiting for Dev',
+                        'Open'
+                    ]
+                },
+                {
+                    name: "Working",
+                    warnAfterDays: 7,
+                    mode: "table",
+                    statuses: [
+                        'In Progress',
+                        'In Development',
+                        'Implementing Change'
+                    ]
+                },
+                {
+                    name: "Review/Testing",
+                    warnAfterDays: 7,
+                    mode: "table",
+                    statuses: [
+                        'Code Review (Pre-Commit)',
+                        'Code Review (Initial)',
+                        'Code Review (Post-Commit)',
+                        'Waiting for Test',
+                        'In Test',
+                        'Under Review',
+                        'Reviewing Change',
+                        'Monitoring Change',
+                        'Waiting for Showcase'
+                    ]
+                }
+            ];
+        }])
     .config(["$stateProvider", "$urlRouterProvider", function ($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise("/index");
         $stateProvider
@@ -32,8 +172,13 @@ angular.module("scrum", ["ngResource", "ui.router"])
             .state("pm", {
                 url: "/pm",
                 templateUrl: "partials/pm.html",
-                controller: "PmController"
+                controller: "PmOverviewController"
             })
+                .state("prioritytickets", {
+                    url: "/prioritytickets",
+                    templateUrl: "partials/prioritytickets.html",
+                    controller: "PmTicketsController"
+                })
             .state("upload", {
                 url: "/upload",
                 templateUrl: "partials/upload.html",
@@ -91,11 +236,13 @@ angular.module("scrum", ["ngResource", "ui.router"])
         return {
             restrict: "E",
             scope: {
-                title: "@",
                 opts: "="
             },
             controller: ["$scope", function ($scope) {
                 $scope.check = function () {
+                    if (!$scope.opts) {
+                        return {loading: true};
+                    }
                     var expected = "";
                     if ($scope.opts.minExpected && $scope.opts.maxExpected) {
                         expected = "Expected " + $scope.opts.minExpected + "-" + $scope.opts.maxExpected;
@@ -115,6 +262,72 @@ angular.module("scrum", ["ngResource", "ui.router"])
             templateUrl: "partials/pm/issueList.html"
         }
     }])
+        .directive("releaseSummary", [function () {
+            return {
+                restrict: "E",
+                scope: {
+                    opts: "="
+                },
+                controller: ["$scope", "releaseStatusGroups", function ($scope, releaseStatusGroups) {
+                    $scope.$watch("opts.issues", function (issues) {
+                        if (!issues) {
+                            return;
+                        }
+                        $scope.chartOptions = {
+                            chart: {
+                                type: 'discreteBarChart',
+                                height: 300,
+                                margin: {
+                                    top: 20,
+                                    right: 20,
+                                    bottom: 50,
+                                    left: 55
+                                },
+                                x: function (d) {
+                                    return d.name;
+                                },
+                                y: function (d) {
+                                    return d.total;
+                                },
+                                showValues: true,
+                                valueFormat: function (d) {
+                                    return d3.format(',.0f')(d);
+                                },
+                                duration: 100,
+                                dispatch: {
+                                    elementClick: function (e) {
+                                        console.log("click");
+                                        console.log(e);
+                                    }
+                                }
+                            }
+                        }
+                        var byStatus = _.groupBy(issues.issues, "fields.status.name");
+                        var values = _.map(releaseStatusGroups, function (group) {
+                            var data = {};
+                            var total = 0;
+                            _.each(group.statuses, function (status) {
+                                data[status] = byStatus[status];
+                                if (data[status]) {
+                                    total += data[status].length;
+                                }
+                            });
+                            return {
+                                name: group.name,
+                                color: group.color,
+                                total: total,
+                                data: data
+                            };
+                        });
+                        $scope.chartData = [{
+                            key: "Statuses",
+                            values: values
+                        }]
+                    })
+                }],
+                templateUrl: "partials/pm/releaseSummary.html"
+            }
+        }])
     .controller("WeekController", ["$scope", "$state", "$resource", "$http", function ($scope, $state, $resource, $http) {
         $scope.start = moment($state.params.startDate);
         $scope.end = moment($scope.start).endOf("week");
@@ -184,126 +397,93 @@ angular.module("scrum", ["ngResource", "ui.router"])
             $scope.scrum = response.data;
         });
     }])
-    .controller("PmController", ["$scope", "$http", function ($scope, $http) {
+        .controller("PmOverviewController", ["$scope", "$http", "needsAttentionStatuses", function ($scope, $http,
+                                                                                                    needsAttentionStatuses) {
+            $scope.queryHasIssues = {};
+            function doJiraQuery(name, title, jql, opts) {
+                $scope[name] = {loading: true, title: title};
+                $http.get("projectmanagement/jiraquery?jql=" + encodeURIComponent(jql)).then(function (response) {
+                    $scope[name] = angular.extend({
+                                                      title: title,
+                                                      issues: response.data,
+                                                      jql: jql
+                                                  }, opts);
+                    $scope.queryHasIssues[name] = response.data.total ? $scope[name] : null;
+                });
+            }
+
+            doJiraQuery("availableCommunityPriority",
+                        "Available Community Priority",
+                        'labels = community-priority AND status in ("Ready for Work", "Waiting for Dev") ORDER BY Rank', {
+                            showNum: 0,
+                            bigNumber: true,
+                            minExpected: 5,
+                            maxExpected: 15
+                        });
+
+            doJiraQuery("availableCuratedIntro",
+                        "Available Curated Intro",
+                        'labels = "intro" AND labels = "curated" AND status in ("Ready for Work", "Waiting for Dev")', {
+                            showNum: 0,
+                            bigNumber: true,
+                            minExpected: 10
+                        });
+
+            doJiraQuery("communityPriorityNeedsAttention",
+                        "Community-Priority",
+                        'labels = "community-priority" AND resolution is empty AND status in (' +
+                        _.map(needsAttentionStatuses, function (it) {
+                            return '"' + it + '"'
+                        }).join(",") +
+                        ')', {
+                            showNum: 5,
+                            bigNumber: false
+                        });
+
+            doJiraQuery("platform1dot12release",
+                        "Platform 1.12",
+                        'project = TRUNK and fixVersion = "Platform 1.12.0"',
+                        {
+                            showNum: 0,
+                            bigNumber: false,
+                            minExpected: 1
+                        });
+
+            doJiraQuery("platform2dot0release",
+                        "Platform 2.0",
+                        'project = TRUNK and fixVersion = "Platform 2.0.0"',
+                        {
+                            showNum: 0,
+                            bigNumber: false,
+                            minExpected: 1
+                        });
+
+            doJiraQuery("refapp2dot4release",
+                        "Reference Appliation 2.4",
+                        'project = RA and fixVersion = "Reference Application 2.4"',
+                        {
+                            showNum: 0,
+                            bigNumber: false,
+                            minExpected: 1
+                        });
+
+            $scope.alertKeys = ["communityPriorityNeedsAttention"];
+            $scope.anyAlerts = function () {
+                return _.some($scope.alertKeys, function (key) {
+                    return $scope.queryHasIssues[key];
+                });
+            }
+        }])
+        .controller("PmTicketsController", ["$scope", "$http", "statusGroups", function ($scope, $http, statusGroups) {
         $scope.brokenBuilds = {loading: true};
         $http.get("ci/brokenbuilds").then(function (response) {
             $scope.brokenBuilds = response.data;
         });
-        var needsAttentionStatuses = [
-            'Cancelled',
-            'Awaiting Approval',
-            'Needs Assessment',
-            'Under Assessment',
-            'Waiting for Analysis',
-            'Waiting on Information',
-            'In Analysis',
-            'Design',
-            'In Backlog',
-            'Reopened',
-            // statuses that shouldn't happen for a priority ticket with resolution=empty
-            'Resolved',
-            'Closed',
-            'Approved',
-            'Accepted'
-        ];
-        $scope.statusGroups = [
-            {
-                name: "Needs Attention",
-                warnAfterDays: 0.1,
-                mode: "list",
-                show: true,
-                statuses: needsAttentionStatuses
-            },
-            {
-                name: "Ready For Work",
-                warnAfterDays: 30,
-                mode: "list",
-                show: false,
-                statuses: [
-                    'Ready for Work',
-                    'Waiting for Dev',
-                    'Open'
-                ]
-            },
-            {
-                name: "Working",
-                warnAfterDays: 7,
-                mode: "table",
-                statuses: [
-                    'In Progress',
-                    'In Development',
-                    'Implementing Change'
-                ]
-            },
-            {
-                name: "Review/Testing",
-                warnAfterDays: 7,
-                mode: "table",
-                statuses: [
-                    'Code Review (Pre-Commit)',
-                    'Code Review (Initial)',
-                    'Code Review (Post-Commit)',
-                    'Waiting for Test',
-                    'In Test',
-                    'Under Review',
-                    'Reviewing Change',
-                    'Monitoring Change',
-                    'Waiting for Showcase'
-                ]
-            }
-        ];
+            $scope.statusGroups = statusGroups;
         function statusGroupFor(issue) {
             return _.find($scope.statusGroups, function (it) {
                 return _.indexOf(it.statuses, issue.fields.status.name) >= 0;
             })
-        }
-
-        $scope.queryHasIssues = {};
-        function doJiraQuery(name, title, jql, opts) {
-            $scope[name] = {loading: true, title: title};
-            $http.get("projectmanagement/jiraquery?jql=" + encodeURIComponent(jql)).then(function (response) {
-                $scope[name] = angular.extend({
-                                                  title: title,
-                                                  issues: response.data,
-                                                  jql: jql
-                                              }, opts);
-                $scope.queryHasIssues[name] = response.data.total ? $scope[name] : null;
-            });
-        }
-
-        doJiraQuery("availableCommunityPriority",
-                    "Available Community Priority",
-                    'labels = community-priority AND status in ("Ready for Work", "Waiting for Dev") ORDER BY Rank', {
-                        showNum: 0,
-                        bigNumber: true,
-                        minExpected: 5,
-                        maxExpected: 15
-        });
-
-        doJiraQuery("availableCuratedIntro",
-                    "Available Curated Intro",
-                    'labels = "intro" AND labels = "curated" AND status in ("Ready for Work", "Waiting for Dev")', {
-                        showNum: 0,
-                        bigNumber: true,
-                        minExpected: 10
-                    });
-
-        doJiraQuery("communityPriorityNeedsAttention",
-                    "Community-Priority",
-                    'labels = "community-priority" AND resolution is empty AND status in (' +
-                    _.map(needsAttentionStatuses, function (it) {
-                        return '"' + it + '"'
-                    }).join(",") +
-                    ')', {
-                        showNum: 5,
-                        bigNumber: false
-                    });
-
-        $scope.alertKeys = ["communityPriorityNeedsAttention"];
-        $scope.anyAlerts = function () {
-            return _.some($scope.alertKeys, function (key) {
-                return $scope.queryHasIssues[key];
-            });
         }
 
         $scope.jqlQuery = "labels = 'community-priority' and resolution is empty";

@@ -2,4 +2,7 @@
     {{ issue.key }}
 </a>
 <small class="label label-default">{{ issue.fields.status.name }}</small>
+<span ng-show="issue.fields.assignee">{{ issue.fields.assignee.displayName }} -</span>
+<span class="text-muted">updated {{issue.fields.updated | prettyDate}}</span>
+<br/>
 <small>{{ issue.fields.summary }}</small>

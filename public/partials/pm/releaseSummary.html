@@ -1,0 +1,6 @@
+<h4>{{opts.title}}</h4>
+<div ng-repeat="stat in stats" ng-style="{color: stat.color}">
+    {{stat.name}}: {{stat.total}}
+</div>
+
+<nvd3 options="chartOptions" data="chartData"></nvd3>
