@@ -56,7 +56,6 @@ module.exports.query = function (jql, opts) {
                             for (var st = response.startAt + response.maxResults; st < response.total; st += response.maxResults) {
                                 morePages.push(st);
                             }
-                            console.log("more pages: " + morePages);
                             return Promise.map(morePages, function (startAt) {
                                 console.log("Getting another page: " + startAt);
                                 return postJson("https://issues.openmrs.org/rest/api/2/search", _.extend({
@@ -67,7 +66,6 @@ module.exports.query = function (jql, opts) {
                             })
                         }),
                         function (first, rest) {
-                            console.log("resolving with rest.length == " + rest.length);
                             var pages = _.flatten([first, rest]);
                             var issues = _.chain(pages).map("issues").flatten().value();
                             return {

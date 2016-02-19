@@ -4,7 +4,7 @@
         <em ng-show="brokenBuilds.loading">Checking Build status</em>
         <span ng-hide="brokenBuilds.loading || brokenBuilds.broken">All CI builds are passing</span>
         <div ng-show="brokenBuilds.broken" class="alert alert-danger" role="alert">
-            <span ng-repeat="line in summary">{{line}}<br/></span>
+            <span ng-repeat="line in brokenBuilds.summary">{{line}}<br/></span>
         </div>
     </div>
 

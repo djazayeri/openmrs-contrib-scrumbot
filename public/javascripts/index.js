@@ -399,6 +399,11 @@ angular.module("scrum", ["ngResource", "ui.router", "nvd3"])
     }])
         .controller("PmOverviewController", ["$scope", "$http", "needsAttentionStatuses", function ($scope, $http,
                                                                                                     needsAttentionStatuses) {
+            $scope.brokenBuilds = {loading: true};
+            $http.get("ci/brokenbuilds").then(function (response) {
+                $scope.brokenBuilds = response.data;
+            });
+
             $scope.queryHasIssues = {};
             function doJiraQuery(name, title, jql, opts) {
                 $scope[name] = {loading: true, title: title};
@@ -475,10 +480,6 @@ angular.module("scrum", ["ngResource", "ui.router", "nvd3"])
             }
         }])
         .controller("PmTicketsController", ["$scope", "$http", "statusGroups", function ($scope, $http, statusGroups) {
-        $scope.brokenBuilds = {loading: true};
-        $http.get("ci/brokenbuilds").then(function (response) {
-            $scope.brokenBuilds = response.data;
-        });
             $scope.statusGroups = statusGroups;
         function statusGroupFor(issue) {
             return _.find($scope.statusGroups, function (it) {
