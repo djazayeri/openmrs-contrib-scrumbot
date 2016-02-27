@@ -25,8 +25,8 @@ module.exports = {
                 raw: conversation,
                 startTime: _.first(conversation).timestamp,
                 endTime: _.last(conversation).timestamp,
-                participants: _.uniq(_.pluck(conversation, "from")),
-                issues: _.chain(processed).pluck("issues").flatten().remove(null).uniq().value()
+                participants: _.uniq(_.map(conversation, "from")),
+                issues: _.chain(processed).map("issues").flatten().remove(null).uniq().value()
             });
         }
         else {

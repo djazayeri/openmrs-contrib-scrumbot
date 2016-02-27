@@ -1,0 +1,19 @@
+version: "2"
+services:
+  elasticsearch:
+     image: elasticsearch:latest
+     command: elasticsearch -Des.network.bindHost=0.0.0.0
+     restart: unless-stopped
+     ports:
+        - "127.0.0.1:9200:9200"
+        - "127.0.0.1:9300:9300"
+     volumes:
+        - "./esdata:/usr/share/elasticsearch/data"
+  web:
+    build:
+      context: .
+    ports:
+        - "80:3000"
+    env_file: "./.env"
+    restart: unless-stopped
+    entrypoint: dockerize -timeout 60s -wait tcp://elasticsearch:9200 -wait tcp://elasticsearch:9300 npm start

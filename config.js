@@ -10,6 +10,8 @@ nconf
             server: "chat.freenode.net",
             channel: "#openmrs",
             nick: "omrs-scrum-bot",
+            userName: "scrumbot",
+            realName: "OpenMRS Scrum Bot",
             startListening: "!scrumon",
             stopListening: "!scrumoff",
             sayBuildFailures: "!scrumon"
