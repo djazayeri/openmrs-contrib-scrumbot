@@ -244,15 +244,16 @@ angular.module("scrum", ["ngResource", "ui.router", "nvd3"])
                         return {loading: true};
                     }
                     var expected = "";
-                    if ($scope.opts.minExpected && $scope.opts.maxExpected) {
+                    // explicitly test vs null, because minExpected might be 0, which is falsey
+                    if ($scope.opts.minExpected != null && $scope.opts.maxExpected != null) {
                         expected = "Expected " + $scope.opts.minExpected + "-" + $scope.opts.maxExpected;
-                    } else if ($scope.opts.minExpected) {
+                    } else if ($scope.opts.minExpected != null) {
                         expected = "Expected >=" + $scope.opts.minExpected;
-                    } else if ($scope.opts.maxExpected) {
+                    } else if ($scope.opts.maxExpected != null) {
                         expected = "Expected <=" + $scope.opts.maxExpected;
                     }
-                    var error = ($scope.opts.minExpected && $scope.opts.issues.total < $scope.opts.minExpected) ||
-                                ($scope.opts.maxExpected && $scope.opts.issues.total > $scope.opts.maxExpected);
+                    var error = ($scope.opts.minExpected != null && $scope.opts.issues.total < $scope.opts.minExpected) ||
+                                ($scope.opts.maxExpected != null && $scope.opts.issues.total > $scope.opts.maxExpected);
                     return {
                         error: error,
                         message: expected
@@ -435,14 +436,22 @@ angular.module("scrum", ["ngResource", "ui.router", "nvd3"])
                         });
 
             doJiraQuery("communityPriorityNeedsAttention",
-                        "Community-Priority",
+                        "Community-Priority Needs Attention",
                         'labels = "community-priority" AND resolution is empty AND status in (' +
                         _.map(needsAttentionStatuses, function (it) {
                             return '"' + it + '"'
                         }).join(",") +
                         ')', {
                             showNum: 5,
-                            bigNumber: false
+                            bigNumber: true,
+                            maxExpected: 0
+                        });
+
+            doJiraQuery("communityPriorityClosedThisWeek",
+                        "Community-Priority Closed This Week",
+                        'labels = "community-priority" AND resolved >= -1w', {
+                            showNum: 5,
+                            bigNumber: true
                         });
 
             doJiraQuery("platform1dot12release",
@@ -472,7 +481,7 @@ angular.module("scrum", ["ngResource", "ui.router", "nvd3"])
                             minExpected: 1
                         });
 
-            $scope.alertKeys = ["communityPriorityNeedsAttention"];
+            $scope.alertKeys = ["communityPriorityClosedThisWeek", "communityPriorityNeedsAttention"];
             $scope.anyAlerts = function () {
                 return _.some($scope.alertKeys, function (key) {
                     return $scope.queryHasIssues[key];

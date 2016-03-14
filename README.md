@@ -8,7 +8,7 @@
 
 ### ES (for a dev environment on OSX)
 
-    $ docker run --name es -d -p 9200:9200 -p 9300:9300 elasticsearch -Des.network.bindHost=0.0.0.0
+    $ docker run --name scrumbot-es -d -p 9200:9200 -p 9300:9300 elasticsearch -Des.network.bindHost=0.0.0.0
      
 ## Run just the listener (without the webapp)
 

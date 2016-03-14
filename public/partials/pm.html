@@ -2,7 +2,9 @@
     <div class="col-md-4">
         <h5>Build Status</h5>
         <em ng-show="brokenBuilds.loading">Checking Build status</em>
-        <span ng-hide="brokenBuilds.loading || brokenBuilds.broken">All CI builds are passing</span>
+        <div ng-hide="brokenBuilds.loading || brokenBuilds.broken" class="alert alert-success" role="alert">
+            All CI builds are passing
+        </div>
         <div ng-show="brokenBuilds.broken" class="alert alert-danger" role="alert">
             <span ng-repeat="line in brokenBuilds.summary">{{line}}<br/></span>
         </div>
@@ -18,7 +20,6 @@
 </div>
 
 <div class="row" ng-show="anyAlerts()">
-    <h4 class="col-md-12">Needs Attention:</h4>
     <div class="col-md-4" ng-repeat="alertKey in alertKeys" ng-show="queryHasIssues[alertKey]">
         <summary-issue-list opts="queryHasIssues[alertKey]"></summary-issue-list>
     </div>
