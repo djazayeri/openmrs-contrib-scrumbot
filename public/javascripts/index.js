@@ -453,16 +453,7 @@ angular.module("scrum", ["ngResource", "ui.router", "nvd3"])
                             showNum: 5,
                             bigNumber: true
                         });
-
-            doJiraQuery("platform1dot12release",
-                        "Platform 1.12",
-                        'project = TRUNK and fixVersion = "Platform 1.12.0"',
-                        {
-                            showNum: 0,
-                            bigNumber: false,
-                            minExpected: 1
-                        });
-
+            
             doJiraQuery("platform2dot0release",
                         "Platform 2.0",
                         'project = TRUNK and fixVersion = "Platform 2.0.0"',
