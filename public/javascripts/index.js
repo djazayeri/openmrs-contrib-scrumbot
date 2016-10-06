@@ -453,19 +453,28 @@ angular.module("scrum", ["ngResource", "ui.router", "nvd3"])
                             showNum: 5,
                             bigNumber: true
                         });
-            
-            doJiraQuery("platform2dot0release",
-                        "Platform 2.0",
-                        'project = TRUNK and fixVersion = "Platform 2.0.0"',
+
+            doJiraQuery("refapp2dot5release",
+                        "Reference Appliation 2.5",
+                        'project = RA and fixVersion = "Reference Application 2.5"',
                         {
                             showNum: 0,
                             bigNumber: false,
                             minExpected: 1
                         });
 
-            doJiraQuery("refapp2dot4release",
-                        "Reference Appliation 2.4",
-                        'project = RA and fixVersion = "Reference Application 2.4"',
+            doJiraQuery("platform2dot0dot1release",
+                        "Platform 2.0.1 Maintenance Release",
+                        'project = TRUNK and fixVersion = "Platform 2.0.1"',
+                        {
+                            showNum: 0,
+                            bigNumber: false,
+                            minExpected: 1
+                        });
+
+            doJiraQuery("platform2dot1release",
+                        "Platform 2.1",
+                        'project = TRUNK and fixVersion = "Platform 2.1.0"',
                         {
                             showNum: 0,
                             bigNumber: false,
