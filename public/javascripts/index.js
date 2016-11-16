@@ -463,9 +463,9 @@ angular.module("scrum", ["ngResource", "ui.router", "nvd3"])
                             minExpected: 1
                         });
 
-            doJiraQuery("platform2dot0dot1release",
-                        "Platform 2.0.1 Maintenance Release",
-                        'project = TRUNK and fixVersion = "Platform 2.0.1"',
+            doJiraQuery("platform2dot0dot2release",
+                        "Platform 2.0.2 Maintenance Release",
+                        'project = TRUNK and fixVersion = "Platform 2.0.2"',
                         {
                             showNum: 0,
                             bigNumber: false,
