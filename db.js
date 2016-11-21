@@ -82,7 +82,7 @@ module.exports.thisWeekScrums = function () {
         body: ejs.Request()
             .query(ejs.RangeQuery("startTime", {gte: "now/w"}))
     }).then(function (response) {
-        return _.pluck(response.hits.hits, "_source").reverse();
+        return _.map(response.hits.hits, "_source").reverse();
     });
 };
 
@@ -92,7 +92,7 @@ module.exports.scrumsWithIssue = function (key) {
         body: ejs.Request()
             .query(ejs.TermQuery("issues", key))
     }).then(function (response) {
-        return _.pluck(response.hits.hits, "_source");
+        return _.map(response.hits.hits, "_source");
     });
 };
 
@@ -116,6 +116,6 @@ module.exports.scrumsBetween = function (startTime, endTime) {
             )
             .sort(ejs.Sort("startTime").desc())
     }).then(function (response) {
-        return _.pluck(response.hits.hits, "_source");
+        return _.map(response.hits.hits, "_source");
     });
 }

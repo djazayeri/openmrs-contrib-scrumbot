@@ -5,3 +5,4 @@ config.json
 node_modules
 logs
 npm-debug.log
+esdata

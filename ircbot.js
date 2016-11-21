@@ -10,6 +10,8 @@ var bamboo = require("./bamboo");
 var SERVER = config.get("irc").server;
 var CHANNEL = config.get("irc").channel;
 var NICK = config.get("irc").nick;
+var USERNAME = config.get("irc").userName;
+var REALNAME = config.get("irc").realName;
 var START_LISTENING = config.get("irc").startListening;
 var STOP_LISTENING = config.get("irc").stopListening;
 var SAY_BUILD_FAILURES = config.get("irc").sayBuildFailures;
@@ -22,8 +24,11 @@ var postMessage = function (text) {
     client.say(CHANNEL, text);
 };
 
-var client = new irc.Client(SERVER, NICK, {channels: [CHANNEL]});
-log.info("Connected to " + CHANNEL);
+var client = new irc.Client(SERVER, NICK, {userName: USERNAME, realName: REALNAME, channels: [CHANNEL]});
+
+client.addListener('names', function(channel, nicks) {
+  log.info("Connected to " + CHANNEL);
+});
 
 client.addListener('error', function (message) {
     log.error(message);
@@ -74,7 +79,7 @@ client.addListener('message', function (from, to, message) {
         bamboo.summarizeBrokenBuilds().then(function (summary) {
             _.each(summary, function (line) {
                 postMessage(line);
-            })
+            });
         });
     }
 });
